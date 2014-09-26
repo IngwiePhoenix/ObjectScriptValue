@@ -13,9 +13,9 @@ int testFunc1(OS* os, int params, int, int, void*) {
 }
 
 // But now, lets get serious. Verify the type.
-OSValue* val;
+Value* val;
 int testFunc2(OS* os, int params, int, int, void*) {
-    val = new OSValue(os, -params+0);
+    val = new Value(os, -params+0);
     val->type();
     return 0;
 }
@@ -23,7 +23,7 @@ int testFunc2(OS* os, int params, int, int, void*) {
 // How about we actually get something off it?
 // Assuming: { foo: "bar" }
 int testFunc3(OS* os, int params, int, int, void*) {
-    OSValue obj(os, -params+0);
+    Value obj(os, -params+0);
     cout << "Foo: " << obj.get("foo") << endl;
     return 0;
 }

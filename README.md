@@ -4,20 +4,22 @@
 Are you working with ObjectScript too, and want to take advantage of its objective aproach even from within your C++ app? Now, you can!
 
 ```c++
-OSValue val(os, MyOffset);
+using namespace ObjectScript;
+
+Value val(os, MyOffset);
 
 // Convert it to a string...or char.
 std::string foo = val;
 char* foo = val;
 
 // Access object properties
-string hostname val["hostname"];
+string hostname = val["hostname"];
 // across multiple levels?
 // Let's assume a Yii-kind of config: components -> redis -> host
 string redisHost = val["components"]["redis"]["host"];
 
 // Want to use it as a pointer? Okay. But you'll loose []'s.
-OSValue* config;
+Value* config;
 void myFunction() {
 	OS* os = OS::create();
 	os->eval("return { username: 'Meep', password: 'Boop' };");

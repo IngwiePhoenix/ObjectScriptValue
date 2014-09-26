@@ -1,9 +1,11 @@
 #include "OSValue.h"
 #include <iostream>
 
+namespace ObjectScript {
+
 using namespace std;
 
-OSValue::OSValue(ObjectScript::OS* os, int off) {
+Value::Value(ObjectScript::OS* os, int off) {
     if(os->isNumber(off)) {
         iVal = os->toNumber(off);
         varType = OSV_NUMBER;
@@ -24,28 +26,70 @@ OSValue::OSValue(ObjectScript::OS* os, int off) {
     }
 }
 
-void OSValue::type() {
-    cout << "Type: ";
+string Value::type() {
     switch(varType) {
         case OSV_NULL:
-            cout << "null";
-        break;
+            return string("null");
         case OSV_BOOL:
-            cout << "boolean";
-        break;
+            return string("boolean");
         case OSV_NUMBER:
-            cout << "number";
-        break;
-        case OSV_FLOAT:
-            cout << "float";
-        break;
+            return string("number");
         case OSV_OBJ:
-            cout << myOS->getTypeStrById(valueID).toChar();
-        break;
+            return string(myOS->getTypeStrById(valueID).toChar());
     }
-    cout << endl;
 }
 
-OSValue::~OSValue() {
-    myOS->releaseValueById(valueID);
+Value::~Value() {
+    if(varType == OSV_OBJ) myOS->releaseValueById(valueID);
+}
+
+char* Value::get(char* index) {
+    switch(varType) {
+        case OSV_NULL:
+        case OSV_BOOL:
+        case OSV_NUMBER:
+        case OSV_FLOAT:
+            return NULL;
+
+        case OSV_OBJ:
+            switch(myOS->getTypeById(valueID)) {
+                case OS_VALUE_TYPE_UNKNOWN:
+                case OS_VALUE_TYPE_NULL:
+                case OS_VALUE_TYPE_BOOL:
+                case OS_VALUE_TYPE_NUMBER:
+                case OS_VALUE_TYPE_USERDATA:
+                case OS_VALUE_TYPE_USERPTR:
+                case OS_VALUE_TYPE_FUNCTION:
+                case OS_VALUE_TYPE_CFUNCTION:
+                    // Those values can not be indexed.
+                    return NULL;
+                case OS_VALUE_TYPE_STRING:
+                    /* Strings need int indexes.
+                    myOS->pushValueById(valueID);
+                    OS::String str = myOS->toString();
+                    myOS->pop();
+                    return (char*)(str[index]);
+                    */
+                    return NULL;
+                case OS_VALUE_TYPE_ARRAY:
+                    myOS->pushValueById(valueID);
+                    /* Obtain string value from array... */
+                    myOS->pop();
+                    return NULL;
+                case OS_VALUE_TYPE_OBJECT:
+                    myOS->pushValueById(valueID);
+                    myOS->getProperty(index);
+                    char* str = (char*)(myOS->toString().toChar());
+                    myOS->pop();
+                    return str;
+            }
+    }
+    cout << "*** OSValue: Reached end of 'Value::get(...)' ***" << endl;
+    return NULL;
+}
+
+string Value::get(string index) {
+    return string( get(index.c_str()) );
+}
+
 }

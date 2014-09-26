@@ -16,7 +16,9 @@
 #include "objectscript.h"
 #endif
 
-class OSValue {
+namespace ObjectScript {
+
+class Value {
 private:
     enum OSVType {
         OSV_NULL,
@@ -33,22 +35,35 @@ private:
     float fVal;
     bool bVal;
 
-    ObjectScript::OS* myOS;
+    OS* myOS;
     int valueID;
 
 public:
-    OSValue(ObjectScript::OS*, int off);
-    ~OSValue();
+    Value(OS*, int off);
+    ~Value();
 
-    void type();
+    // Type info
+    std::string type();
 
-    std::string get(std::string index) {
-        myOS->pushValueById(valueID);
-        myOS->getProperty(-1, index.c_str());
-        std::string rtstr( myOS->popString().toChar() );
-        myOS->pop();
-        return rtstr;
-    }
+    // Getter
+    std::string get(std::string index);
+    char* get(char* index);
+
+    bool set(std::string key, int value);
+    bool set(std::string key, float value);
+    bool set(std::string key, bool value);
+    bool set(std::string key, std::string value);
+    bool set(std::string key, char* value);
+    bool set(std::string key, const char* value);
+    bool set(std::string key, Value value);
+
+    bool set(const char* key, int value);
+    bool set(const char* key, float value);
+    bool set(const char* key, bool value);
+    bool set(const char* key, std::string value);
+    bool set(const char* key, char* value);
+    bool set(const char* key, const char* value);
+    bool set(const char* key, Value value);
 
     /*
     operator int ();
@@ -66,3 +81,5 @@ public:
     //operator [](int x, int y);
     */
 };
+
+}
