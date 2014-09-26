@@ -45,46 +45,40 @@ Value::~Value() {
 }
 
 char* Value::get(char* index) {
-    switch(varType) {
-        case OSV_NULL:
-        case OSV_BOOL:
-        case OSV_NUMBER:
-        case OSV_FLOAT:
-            return NULL;
+    // Used later to avoid error about protected scope.
+    OS::String o_str(myOS);
 
-        case OSV_OBJ:
-            switch(myOS->getTypeById(valueID)) {
-                case OS_VALUE_TYPE_UNKNOWN:
-                case OS_VALUE_TYPE_NULL:
-                case OS_VALUE_TYPE_BOOL:
-                case OS_VALUE_TYPE_NUMBER:
-                case OS_VALUE_TYPE_USERDATA:
-                case OS_VALUE_TYPE_USERPTR:
-                case OS_VALUE_TYPE_FUNCTION:
-                case OS_VALUE_TYPE_CFUNCTION:
-                    // Those values can not be indexed.
-                    return NULL;
-                case OS_VALUE_TYPE_STRING:
-                    /* Strings need int indexes.
-                    myOS->pushValueById(valueID);
-                    OS::String str = myOS->toString();
-                    myOS->pop();
-                    return (char*)(str[index]);
-                    */
-                    return NULL;
-                case OS_VALUE_TYPE_ARRAY:
-                    myOS->pushValueById(valueID);
-                    myOS->pushNumber(atoi(index));
-                    myOS->getProperty();
-                    return (char*)(myOS->popString().toChar());
-                case OS_VALUE_TYPE_OBJECT:
-                    myOS->pushValueById(valueID);
-                    myOS->pushString(index);
-                    myOS->getProperty();
-                    return (char*)(myOS->popString().toChar());
-            }
+    if(varType == OSV_OBJ) {
+        switch(myOS->getTypeById(valueID)) {
+            case OS_VALUE_TYPE_NULL:
+            case OS_VALUE_TYPE_BOOL:
+            case OS_VALUE_TYPE_NUMBER:
+            case OS_VALUE_TYPE_USERDATA:
+            case OS_VALUE_TYPE_USERPTR:
+            case OS_VALUE_TYPE_FUNCTION:
+            case OS_VALUE_TYPE_CFUNCTION:
+                // Those values can not be indexed.
+                return NULL;
+            case OS_VALUE_TYPE_STRING:
+                // Strings need int indexes.
+                myOS->pushValueById(valueID);
+                o_str = myOS->toString();
+                myOS->pop();
+                // Not elegant, as OS_CHAR could be char* ... whatever.
+                return (char*)(o_str[atoi(index)]);
+            case OS_VALUE_TYPE_ARRAY:
+                myOS->pushValueById(valueID);
+                myOS->pushNumber(atoi(index));
+                myOS->getProperty();
+                return (char*)(myOS->popString().toChar());
+            case OS_VALUE_TYPE_OBJECT:
+                myOS->pushValueById(valueID);
+                myOS->pushString(index);
+                myOS->getProperty();
+                return (char*)(myOS->popString().toChar());
+        }
     }
-    cout << "*** OSValue: Reached end of 'Value::get(...)' ***" << endl;
+    cerr << "*** OSValue: Reached end of 'char* Value::get(char*)' ***" << endl;
     return NULL;
 }
 
@@ -92,9 +86,98 @@ string Value::get(string index) {
     return string( get(index.c_str()) );
 }
 
+int Value::get(int index) {
+    if(varType == OSV_OBJ) {
+        switch(myOS->getTypeById(valueID)) {
+            case OS_VALUE_TYPE_NULL:
+            case OS_VALUE_TYPE_BOOL:
+            case OS_VALUE_TYPE_NUMBER:
+            case OS_VALUE_TYPE_USERDATA:
+            case OS_VALUE_TYPE_USERPTR:
+            case OS_VALUE_TYPE_FUNCTION:
+            case OS_VALUE_TYPE_CFUNCTION:
+                return NULL;
+            case OS_VALUE_TYPE_STRING:
+                // Indexing a string results in a char. No go for ints here.
+                return NULL;
+            case OS_VALUE_TYPE_ARRAY:
+                myOS->pushValueById(valueID);
+                myOS->pushNumber(index);
+                myOS->getProperty();
+                return myOS->popInt();
+            case OS_VALUE_TYPE_OBJECT:
+                myOS->pushValueById(valueID);
+                myOS->pushNumber(index);
+                myOS->getProperty();
+                return myOS->popInt();
+        }
+    }
+    cerr << "*** OSValue: Reached end of 'int Value::get(int)' ***" << endl;
+    return NULL;
+
+}
+
 // Overloaders point at ::get(...) methods.
 string Value::operator [](string index) { return get(index); }
 char* Value::operator [](char* index) { return get(index); }
+//const char* Value::operator [](long, const char* index) { return get(index); }
 
+// Caster
+/*Value::operator int () {
+    int o_len;
+    switch(varType) {
+        case OSV_NULL:
+            return 0;
+        case OSV_BOOL:
+            return (int)bVal;
+        case OSV_NUMBER:
+            return iVal;
+        case OSV_OBJ:
+            switch(myOS->getTypeById(valueID)) {
+                case OS_VALUE_TYPE_NULL:
+                case OS_VALUE_TYPE_BOOL:
+                case OS_VALUE_TYPE_NUMBER:
+                case OS_VALUE_TYPE_STRING:
+                    return NULL;
+                case OS_VALUE_TYPE_ARRAY:
+                case OS_VALUE_TYPE_OBJECT:
+                    // These values are ID'd. So we can go from there.
+                    myOS->pushValueById(valueID);
+                    o_len = myOS->getLen();
+                    myOS->pop();
+                    return o_len;
+                case OS_VALUE_TYPE_USERDATA:
+                case OS_VALUE_TYPE_USERPTR:
+                case OS_VALUE_TYPE_FUNCTION:
+                case OS_VALUE_TYPE_CFUNCTION:
+                    // No chance we're able to return a length here.
+                    return NULL;
+            }
+    }
+}
+Value::operator float () {
+    // This is ONLY possible on a numeric value.
+    if(varType == OSV_NUMBER) {
+        return fVal;
+    } else return NULL;
+}
+Value::operator bool () {
+    // This pretty much only works on bools.
+    if(varType == OSV_BOOL) {
+        return bVal;
+    } else return NULL;
+}
+Value::operator string () {
+    // Strings are a different topic...but do-able.
+    if(varType == OSV_OBJ) {
+        myOS->pushValueById(valueID);
+        OS::String str = myOS->toString();
+        myOS->pop();
+        return string( str.toChar() );
+    } else {
+        // o.o i am too lazy for this now.
+        return string("<Lazyness wins.>");
+    }
+}*/
 
 }

@@ -31,22 +31,27 @@ int testFunc3(OS* os, int params, int, int, void*) {
 int main() {
     OS* os = OS::create();
 
-    OS::FuncDef func1 = {OS_TEXT("testFunc1"), testFunc1};
-    OS::FuncDef func2 = {OS_TEXT("testFunc2"), testFunc2};
-    OS::FuncDef func3 = {OS_TEXT("testFunc3"), testFunc3};
-    os->setGlobal(func1);
-    os->setGlobal(func2);
-    os->setGlobal(func3);
+    OS::FuncDef funcs[] = {
+        {OS_TEXT("testFunc1"), testFunc1},
+        {OS_TEXT("testFunc2"), testFunc2},
+        {OS_TEXT("testFunc3"), testFunc3},
+        {}
+    };
+    os->pushGlobals();
+    os->setFuncs(funcs);
+    os->pop();
 
     // Basic
     os->eval("testFunc1 'meep!';");
 
     // Type testing
-    os->eval("testFunc2( {key: 20} )");
-    os->eval("testFunc2(function(){return true;})");
-    os->eval("testFunc2(null)");
-    os->eval("testFunc2(3.19)");
-    os->eval("testFunc2([1, '2', {k:3}])");
+    os->eval("testFunc2( null )");
+    os->eval("testFunc2( true )");
+    os->eval("testFunc2( 42 )");
+    os->eval("testFunc2( 3.21 )");
+    os->eval("testFunc2( \"Foo Bar\" )");
+    os->eval("testFunc2( {AnswerToEverything:42} )");
+    os->eval("testFunc2( function(){ return 0; } )");
 
     // Getting properties. Expecting Foo here-
     os->eval("testFunc3( {foo: \"bar\"} )");

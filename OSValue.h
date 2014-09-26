@@ -48,9 +48,14 @@ public:
     // Getter
     std::string get(std::string index);
     char* get(char* index);
+    int get(int index);
+
+    // Operator[] to overlay get(...)
     std::string operator [](std::string index);
     char* operator [](char* index);
+    //const char* operator [](long, const char* index);
 
+    // Objects.
     bool set(std::string key, int value);
     bool set(std::string key, float value);
     bool set(std::string key, bool value);
@@ -59,6 +64,7 @@ public:
     bool set(std::string key, const char* value);
     bool set(std::string key, Value value);
 
+    // C-style string keys.
     bool set(const char* key, int value);
     bool set(const char* key, float value);
     bool set(const char* key, bool value);
@@ -67,18 +73,21 @@ public:
     bool set(const char* key, const char* value);
     bool set(const char* key, Value value);
 
+    // Arrays
+    bool set(int key, int value);
+    bool set(int key, float value);
+    bool set(int key, bool value);
+    bool set(int key, std::string value);
+    bool set(int key, char* value);
+    bool set(int key, const char* value);
+    bool set(int key, Value value);
+
+    // Operators to "cast" to specific type.
     /*
     operator int ();
     operator float ();
     operator bool ();
     operator std::string ();
-    #ifdef OS_CHAR
-    operator OS_CHAR ();
-    #endif
-    operator [](int index);
-
-    // Table operator: var[1,2]
-    //operator [](int x, int y);
     */
 };
 
