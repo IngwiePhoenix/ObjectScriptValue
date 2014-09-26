@@ -31,14 +31,12 @@ int testFunc3(OS* os, int params, int, int, void*) {
 int main() {
     OS* os = OS::create();
 
-    os->pushCFunction(testFunc1);
-    os->setGlobal("testFunc1");
-
-    os->pushCFunction(testFunc2);
-    os->setGlobal("testFunc2");
-
-    os->pushCFunction(testFunc3);
-    os->setGlobal("testFunc3");
+    OS::FuncDef func1 = {OS_TEXT("testFunc1"), testFunc1};
+    OS::FuncDef func2 = {OS_TEXT("testFunc2"), testFunc2};
+    OS::FuncDef func3 = {OS_TEXT("testFunc3"), testFunc3};
+    os->setGlobal(func1);
+    os->setGlobal(func2);
+    os->setGlobal(func3);
 
     // Basic
     os->eval("testFunc1 'meep!';");

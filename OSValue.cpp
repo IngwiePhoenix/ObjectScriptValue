@@ -1,5 +1,6 @@
 #include "OSValue.h"
 #include <iostream>
+#include <stdlib.h>
 
 namespace ObjectScript {
 
@@ -73,15 +74,14 @@ char* Value::get(char* index) {
                     return NULL;
                 case OS_VALUE_TYPE_ARRAY:
                     myOS->pushValueById(valueID);
-                    /* Obtain string value from array... */
-                    myOS->pop();
-                    return NULL;
+                    myOS->pushNumber(atoi(index));
+                    myOS->getProperty();
+                    return (char*)(myOS->popString().toChar());
                 case OS_VALUE_TYPE_OBJECT:
                     myOS->pushValueById(valueID);
-                    myOS->getProperty(index);
-                    char* str = (char*)(myOS->toString().toChar());
-                    myOS->pop();
-                    return str;
+                    myOS->pushString(index);
+                    myOS->getProperty();
+                    return (char*)(myOS->popString().toChar());
             }
     }
     cout << "*** OSValue: Reached end of 'Value::get(...)' ***" << endl;
