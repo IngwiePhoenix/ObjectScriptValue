@@ -92,4 +92,9 @@ string Value::get(string index) {
     return string( get(index.c_str()) );
 }
 
+// Overloaders point at ::get(...) methods.
+string Value::operator [](string index) { return get(index); }
+char* Value::operator [](char* index) { return get(index); }
+
+
 }

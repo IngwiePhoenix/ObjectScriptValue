@@ -48,6 +48,8 @@ public:
     // Getter
     std::string get(std::string index);
     char* get(char* index);
+    std::string operator [](std::string index);
+    char* operator [](char* index);
 
     bool set(std::string key, int value);
     bool set(std::string key, float value);
@@ -74,8 +76,6 @@ public:
     operator OS_CHAR ();
     #endif
     operator [](int index);
-    operator [](std::string index);
-    operator [](char* index);
 
     // Table operator: var[1,2]
     //operator [](int x, int y);

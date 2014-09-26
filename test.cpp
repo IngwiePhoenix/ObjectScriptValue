@@ -16,7 +16,7 @@ int testFunc1(OS* os, int params, int, int, void*) {
 Value* val;
 int testFunc2(OS* os, int params, int, int, void*) {
     val = new Value(os, -params+0);
-    val->type();
+    cout << "Type: " << val->type() << endl;
     return 0;
 }
 
@@ -24,7 +24,7 @@ int testFunc2(OS* os, int params, int, int, void*) {
 // Assuming: { foo: "bar" }
 int testFunc3(OS* os, int params, int, int, void*) {
     Value obj(os, -params+0);
-    cout << "Foo: " << obj.get("foo") << endl;
+    cout << "Foo: " << obj["foo"] << endl;
     return 0;
 }
 
