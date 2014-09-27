@@ -45,14 +45,14 @@ public:
     // Type info
     std::string type();
 
-    // Getter
-    std::string get(std::string index);
     // String getters. For objects
+    std::string get(std::string index);
     char* get(char* index);
+    // Array getters. Uses int as key.
     int get(int index);
 
     // Operator[] to overlay get(...)
-    //std::string operator [](std::string index);
+    std::string operator [](std::string index);
     const char* operator [](const char* index);
     //int operator [](int index) { return 0; }
 
@@ -84,8 +84,8 @@ public:
     bool set(int key, Value value);
 
     // Operators to "cast" to specific type.
-    //operator int ();
-    //operator float ();
+    operator int ();
+    operator float ();
     operator bool ();
     operator std::string ();
 };

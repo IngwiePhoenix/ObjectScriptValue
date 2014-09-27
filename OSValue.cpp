@@ -79,7 +79,7 @@ char* Value::get(char* index) {
 }
 
 string Value::get(string index) {
-    return string( get(index.c_str()) );
+    return string( get(index) );
 }
 
 int Value::get(int index) {
@@ -114,11 +114,11 @@ int Value::get(int index) {
 }
 
 // Overloaders point at ::get(...) methods. For objects.
-//const string Value::operator [](string index) { return get(index); }
-const char* Value::operator [](const char* index) { return (const char*)get(index).c_str(); }
+string Value::operator [](string index) { return get((char*)(index.c_str())); }
+const char* Value::operator [](const char* index) { return get((char*)index); }
 
 // Caster
-/*Value::operator int () {
+Value::operator int () {
     int o_len;
     switch(varType) {
         case OSV_NULL:
@@ -149,13 +149,13 @@ const char* Value::operator [](const char* index) { return (const char*)get(inde
                     return NULL;
             }
     }
-}*/
-/*Value::operator float () {
+}
+Value::operator float () {
     // This is ONLY possible on a numeric value.
     if(varType == OSV_NUMBER) {
         return fVal;
     } else return NULL;
-}*/
+}
 Value::operator bool() {
     // This pretty much only works on bools.
     if(varType == OSV_BOOL) {
