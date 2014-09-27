@@ -57,7 +57,8 @@ char* Value::get(char* index) {
             case OS_VALUE_TYPE_USERPTR:
             case OS_VALUE_TYPE_FUNCTION:
             case OS_VALUE_TYPE_CFUNCTION:
-                // Those values can not be indexed.
+            case OS_VALUE_TYPE_ARRAY:
+                // Those values can not be indexed with a string value.
                 return NULL;
             case OS_VALUE_TYPE_STRING:
                 // Strings need int indexes.
@@ -66,11 +67,6 @@ char* Value::get(char* index) {
                 myOS->pop();
                 // Not elegant, as OS_CHAR could be char* ... whatever.
                 return (char*)(o_str[atoi(index)]);
-            case OS_VALUE_TYPE_ARRAY:
-                myOS->pushValueById(valueID);
-                myOS->pushNumber(atoi(index));
-                myOS->getProperty();
-                return (char*)(myOS->popString().toChar());
             case OS_VALUE_TYPE_OBJECT:
                 myOS->pushValueById(valueID);
                 myOS->pushString(index);
@@ -117,10 +113,9 @@ int Value::get(int index) {
 
 }
 
-// Overloaders point at ::get(...) methods.
-string Value::operator [](string index) { return get(index); }
-char* Value::operator [](char* index) { return get(index); }
-//const char* Value::operator [](long, const char* index) { return get(index); }
+// Overloaders point at ::get(...) methods. For objects.
+//const string Value::operator [](string index) { return get(index); }
+const char* Value::operator [](const char* index) { return (const char*)get(index).c_str(); }
 
 // Caster
 /*Value::operator int () {
@@ -154,14 +149,14 @@ char* Value::operator [](char* index) { return get(index); }
                     return NULL;
             }
     }
-}
-Value::operator float () {
+}*/
+/*Value::operator float () {
     // This is ONLY possible on a numeric value.
     if(varType == OSV_NUMBER) {
         return fVal;
     } else return NULL;
-}
-Value::operator bool () {
+}*/
+Value::operator bool() {
     // This pretty much only works on bools.
     if(varType == OSV_BOOL) {
         return bVal;
@@ -178,6 +173,6 @@ Value::operator string () {
         // o.o i am too lazy for this now.
         return string("<Lazyness wins.>");
     }
-}*/
+}
 
 }

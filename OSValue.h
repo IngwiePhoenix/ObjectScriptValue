@@ -47,13 +47,14 @@ public:
 
     // Getter
     std::string get(std::string index);
+    // String getters. For objects
     char* get(char* index);
     int get(int index);
 
     // Operator[] to overlay get(...)
-    std::string operator [](std::string index);
-    char* operator [](char* index);
-    //const char* operator [](long, const char* index);
+    //std::string operator [](std::string index);
+    const char* operator [](const char* index);
+    //int operator [](int index) { return 0; }
 
     // Objects.
     bool set(std::string key, int value);
@@ -83,12 +84,10 @@ public:
     bool set(int key, Value value);
 
     // Operators to "cast" to specific type.
-    /*
-    operator int ();
-    operator float ();
+    //operator int ();
+    //operator float ();
     operator bool ();
     operator std::string ();
-    */
 };
 
 }
