@@ -219,8 +219,8 @@ Method::Method(OS* os, Object* obj, const char* methodName) {
     os->pop(); // Object
 }
 Method::~Method() {
-    Obj->~Object();
-    Mtd->~Function();
+    // Obj was passed in as a reference, the User is responsible for it.
+    delete Mtd;
 }
 void Method::operator ()(int args, int rtVals) {
     myOS->pushValueById(Obj->valueID);
