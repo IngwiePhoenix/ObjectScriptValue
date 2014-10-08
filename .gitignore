@@ -8,3 +8,4 @@ objectscript.cpp
 objectscript.h
 test
 *.dSYM
+.DS_Store

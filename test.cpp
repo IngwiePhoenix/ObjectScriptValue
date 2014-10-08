@@ -1,64 +1,91 @@
-#include <iostream>
+#include "os-value.hpp"
 #include "objectscript.h"
-#include "OSValue.h"
+#include <iostream>
 
 using namespace std;
 using namespace ObjectScript;
 
-// How to use a OS String
-int testFunc1(OS* os, int params, int, int, void*) {
-    string ex( os->toString(-params+0).toChar() );
-    cout << "Example string: " << ex << endl;
-    return 0;
-}
-
-// But now, lets get serious. Verify the type.
-Value* val;
-int testFunc2(OS* os, int params, int, int, void*) {
-    val = new Value(os, -params+0);
-    cout << "Type: " << val->type() << endl;
-    return 0;
-}
-
-// How about we actually get something off it?
-// Assuming: { foo: "bar" }
-int testFunc3(OS* os, int params, int, int, void*) {
-    Value obj(os, -params+0);
-    cout << "Foo: " << obj["foo"] << endl;
-    return 0;
-}
-
-int main() {
+int main(void) {
     OS* os = OS::create();
 
-    OS::FuncDef funcs[] = {
-        {OS_TEXT("testFunc1"), testFunc1},
-        {OS_TEXT("testFunc2"), testFunc2},
-        {OS_TEXT("testFunc3"), testFunc3},
-        {}
-    };
-    os->pushGlobals();
-    os->setFuncs(funcs);
+    /*
+        In the following tests, we're pushing values into the stack,
+        just as it would appear in a function call.
+
+        We then return the actual value as string,
+        then test it as the C++ instance.
+    */
+
+    // 0. Helper macros
+    #define printReal() cout << "The actual value is: " << os->toString(-1).toChar() << endl
+    #define next() cout << endl;
+
+    // 1. Numbers
+    os->pushNumber(10);
+    printReal();
+    Value::Primitive n(os);
+    cout << "Primitive is: " << (int)n << endl;
     os->pop();
+    next()
 
-    // Basic
-    os->eval("testFunc1 'meep!';");
+    // 2. Floats
+    os->pushNumber(3.91);
+    printReal();
+    Value::Primitive f(os);
+    cout << "Primitive as float is: " << (float)f << endl;
+    os->pop();
+    next()
 
-    // Type testing
-    os->eval("testFunc2( null )");
-    os->eval("testFunc2( true )");
-    os->eval("testFunc2( 42 )");
-    os->eval("testFunc2( 3.21 )");
-    os->eval("testFunc2( \"Foo Bar\" )");
-    os->eval("testFunc2( {AnswerToEverything:42} )");
-    os->eval("testFunc2( function(){ return 0; } )");
+    // 3. String
+    os->pushString("Fubar'd");
+    printReal();
+    Value::String s(os);
+    cout << "String value is: " << (const char*)s << endl;
+    os->pop();
+    next()
 
-    // Getting properties. Expecting Foo here-
-    os->eval("testFunc3( {foo: \"bar\"} )");
+    // 4. Let's try out an array...this is harder.
+    os->newArray();
+    os->pushNumber(99);
+    os->addProperty(-2);
+    os->pushString("Dohlen");
+    os->addProperty(-2);
+    // Array resides within -1, and has consumed the other values. -2 and -3 are null.
+    // Now, let's try to test it.
+    printReal();
+    /*
+        Accessing an array is not easy, and creating values of it, is neither.
+        In V8, you have a Handle<> class - it uses templating.
+        In the future, I will use this too. For now, just cast the value
+        to the proper Value type.
+    */
+    Value::Array a(os);
+    Value::Primitive* pn = (Value::Primitive*)a[0];
+    Value::String* ps = (Value::String*)a[1];
+    // We have to dereference the pointer, so we can trigger the casting methods again...
+    // I am sure there is an easier way to aproach this!...somehow.
+    cout << "[" << (int)(*pn) << "] -> " << (const char*)(*ps) << endl;
+    // Array test complete.
+    os->pop();
+    next()
 
-    cout << "Current stack size: " << os->getStackSize() << endl;
-    cout << "Last value is a: " << os->getTypeStr().toChar() << endl;
+    // 5. Objects.
+    os->newObject();
+    os->pushString("bar");
+    os->setProperty(-2, "foo");
+    // { "foo": "bar" }
+    printReal();
+    Value::Object o(os);
+    Value::String* obj_s = (Value::String*)o["foo"];
+    cout << "foo -> " << (const char*)(*obj_s) << endl;
+    os->pop();
+    next()
 
-    cout << "Gonna foo it again!" << endl;
-    os->eval("testFunc3( {foo: \"bar\"} )");
+    // 6. And now...functions.
+    // THIS is a hard one! O.O
+    os->eval("function greeter() { echo 'Greetings, C++! How\\'re you doing?' }");
+    os->getGlobal("greeter"); // Put the function to stack
+    printReal();
+    Value::Function func(os);
+    func(2, NULL);
 }
