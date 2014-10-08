@@ -1,4 +1,4 @@
-#include "os-value.hpp"
+#include "os-value.h"
 #include "objectscript.h"
 #include <iostream>
 
@@ -7,6 +7,7 @@ using namespace ObjectScript;
 
 int main(void) {
     OS* os = OS::create();
+    os->retain();
 
     /*
         In the following tests, we're pushing values into the stack,
@@ -83,9 +84,20 @@ int main(void) {
 
     // 6. And now...functions.
     // THIS is a hard one! O.O
-    os->eval("function greeter() { echo 'Greetings, C++! How\\'re you doing?' }");
+    os->eval("function greeter() { echo \"Greetings, C++! How\'re you doing?\\n\" }");
     os->getGlobal("greeter"); // Put the function to stack
     printReal();
     Value::Function func(os);
-    func(2, NULL);
+    func(0,0);
+    next();
+
+    // Let's try a method.
+    os->eval("myObj = {meeper:function(){ echo \"Meep meep!\\n\" }}");
+    os->getGlobal("myObj");
+    printReal();
+    Value::Object myObj(os);
+    Value::Method mt(os, &myObj, "meeper");
+    mt(0,0);
+
+    os->release();
 }
