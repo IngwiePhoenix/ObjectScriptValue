@@ -25,6 +25,7 @@ namespace Value {
     public:
         Primitive(OS* os, int off);
         Primitive(OS* os);
+        ~Primitive();
         bool initialize();
         operator int();
         operator float();

@@ -12,8 +12,9 @@ Var::Var(OS* os, int off=-1) : valueID(-1), offset(off) {
 }
 
 // Primitive, Null, Int, Float, Bool.
-Primitive::Primitive(OS* os, int off) : Var(os, off) { initialize(); }
-Primitive::Primitive(OS* os) : Var(os, -1) { initialize(); }
+Primitive::Primitive(OS* os, int off) : Var(os, off) { os->retain(); initialize(); }
+Primitive::Primitive(OS* os) : Var(os, -1) { os->retain(); initialize(); }
+Primitive::~Primitive() { myOS->release(); }
 
 bool Primitive::initialize() {
     if(type == OS_VALUE_TYPE_NULL) {
@@ -45,9 +46,9 @@ Primitive::operator OS_NUMBER() { return nVal; }
 Primitive::operator bool() { return bVal; }
 
 // String class
-String::String(OS* os, int off) : Var(os, off) { initialize(); }
-String::String(OS* os) : Var(os, -1) { initialize(); }
-String::~String() { myOS->releaseValueById(valueID); }
+String::String(OS* os, int off) : Var(os, off) { os->retain(); initialize(); }
+String::String(OS* os) : Var(os, -1) { os->retain(); initialize(); }
+String::~String() { myOS->releaseValueById(valueID); myOS->release(); }
 
 bool String::initialize() {
     if(type == OS_VALUE_TYPE_STRING) {
@@ -69,9 +70,9 @@ String::operator std::string() {
 }
 
 // Array class
-Array::Array(OS* os, int off) : Var(os, off) { initialize(); }
-Array::Array(OS* os) : Var(os, -1) { initialize(); }
-Array::~Array() { myOS->releaseValueById(valueID); }
+Array::Array(OS* os, int off) : Var(os, off) { os->retain(); initialize(); }
+Array::Array(OS* os) : Var(os, -1) { os->retain(); initialize(); }
+Array::~Array() { myOS->releaseValueById(valueID); myOS->release(); }
 
 bool Array::initialize() {
     if(type == OS_VALUE_TYPE_ARRAY) {
@@ -132,9 +133,9 @@ Var* Array::operator [](int index) {
 }
 
 // Object class
-Object::Object(OS* os, int off) : Var(os, off) { initialize(); }
-Object::Object(OS* os) : Var(os, -1) { initialize(); }
-Object::~Object() { myOS->releaseValueById(valueID); }
+Object::Object(OS* os, int off) : Var(os, off) { os->retain(); initialize(); }
+Object::Object(OS* os) : Var(os, -1) { os->retain(); initialize(); }
+Object::~Object() { myOS->releaseValueById(valueID); myOS->release(); }
 
 bool Object::initialize() {
     if(type == OS_VALUE_TYPE_OBJECT) {
@@ -188,9 +189,9 @@ Var* Object::operator [](std::string index) {
 }
 
 // Function class
-Function::Function(OS* os, int off) : Var(os, off) { initialize(); }
-Function::Function(OS* os) : Var(os, -1) { initialize(); }
-Function::~Function() { myOS->releaseValueById(valueID); }
+Function::Function(OS* os, int off) : Var(os, off) { os->retain(); initialize(); }
+Function::Function(OS* os) : Var(os, -1) { os->retain(); initialize(); }
+Function::~Function() { myOS->releaseValueById(valueID); myOS->release(); }
 
 bool Function::initialize() {
     if(type == OS_VALUE_TYPE_FUNCTION) {

@@ -7,7 +7,7 @@ using namespace ObjectScript;
 
 int main(void) {
     OS* os = OS::create();
-    os->retain();
+    //os->retain();
 
     /*
         In the following tests, we're pushing values into the stack,
@@ -67,6 +67,8 @@ int main(void) {
     // I am sure there is an easier way to aproach this!...somehow.
     cout << "[" << (int)(*pn) << "] -> " << (const char*)(*ps) << endl;
     // Array test complete.
+    delete pn;
+    delete ps;
     os->pop();
     next()
 
@@ -79,6 +81,7 @@ int main(void) {
     Value::Object o(os);
     Value::String* obj_s = (Value::String*)o["foo"];
     cout << "foo -> " << (const char*)(*obj_s) << endl;
+    delete obj_s;
     os->pop();
     next()
 
@@ -89,7 +92,7 @@ int main(void) {
     printReal();
     Value::Function func(os);
     func(0,0);
-    next();
+    next()
 
     // Let's try a method.
     os->eval("myObj = {meeper:function(){ echo \"Meep meep!\\n\" }}");
