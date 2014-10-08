@@ -204,7 +204,8 @@ bool Function::initialize() {
 
 void Function::operator ()(int args, int rtVals) {
     myOS->pushValueById(valueID);
-    myOS->call(args, rtVals);
+    myOS->move(-1, -args-1);
+    myOS->callF(args, rtVals);
 }
 
 // Finally, Method class
@@ -223,9 +224,11 @@ Method::~Method() {
     delete Mtd;
 }
 void Method::operator ()(int args, int rtVals) {
-    myOS->pushValueById(Obj->valueID);
     myOS->pushValueById(Mtd->valueID);
-    myOS->callTF(args, rtVals);
+    myOS->move(-1, -args-1);
+    myOS->pushValueById(Obj->valueID);
+    myOS->move(-1, -args-1);
+    myOS->callFT(args, rtVals);
 }
 
 }

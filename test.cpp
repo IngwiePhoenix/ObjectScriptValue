@@ -101,6 +101,25 @@ int main(void) {
     Value::Object myObj(os);
     Value::Method mt(os, &myObj, "meeper");
     mt(0,0);
+    next()
+
+    // 8. Functions, with parameters.
+    os->eval("function greeter2(name) { echo \"Hey ${name}!\\n\"}");
+    os->getGlobal("greeter2");
+    printReal();
+    Value::Function greeter2(os);
+    os->pushString("Ingwie Phoenix");
+    greeter2(1,0);
+    next()
+
+    // 9. Object method with parameter
+    os->eval("myObj2 = { myFunc: function(e) { echo \"Debug message is: ${e}\\n\" } }");
+    os->getGlobal("myObj2");
+    printReal();
+    Value::Object myObj2(os);
+    Value::Method myFunc(os, &myObj2, "myFunc");
+    os->pushString("Everything's okay!");
+    myFunc(1,0);
 
     os->release();
 }
